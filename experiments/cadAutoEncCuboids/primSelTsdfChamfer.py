@@ -119,9 +119,9 @@ criterion  = nn.L1Loss()
 def train(dataloader, netPred, reward_shaper, optimizer, iter):
   inputVol, tsdfGt, sampledPoints, loaded_cps = dataloader.forward()
   # pdb.set_trace()
-  inputVol = Variable(inputVol.clone().cuda())
-  tsdfGt = Variable(tsdfGt.cuda())
-  sampledPoints = Variable(sampledPoints.cuda()) ## B x np x 3
+  inputVol = Variable(inputVol.clone())
+  tsdfGt = Variable(tsdfGt)
+  sampledPoints = Variable(sampledPoints) ## B x np x 3
   predParts, stocastic_actions = netPred.forward(inputVol) ## B x nPars*11
   predParts = predParts.view(predParts.size(0), params.nParts, 12)
   # pdb.set_trace()
@@ -200,7 +200,7 @@ class Network(nn.Module):
     return primitives, stocastic_actions
 
 netPred = Network(params)
-netPred.cuda()
+# netPred.cuda()
 
 reward_shaper = primitives.ReinforceShapeReward(params.bMomentum,  params.intrinsicReward, params.entropyWt)
 # reward_shaper.cuda()
@@ -245,8 +245,8 @@ for iter  in range(params.numTrainIter):
 
     sample, tsdfGt, sampledPoints = dataloader.forwardTest()
 
-    sampledPoints = sampledPoints[0:params.batchSizeVis].cuda()
-    sample = sample[0:params.batchSizeVis].cuda()
+    sampledPoints = sampledPoints[0:params.batchSizeVis]
+    sample = sample[0:params.batchSizeVis]
     tsdfGt = tsdfGt[0:params.batchSizeVis].view(reshapeSize)
 
     tsdfGtSq = tsdfSqModTest(tsdfGt)

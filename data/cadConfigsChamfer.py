@@ -45,7 +45,7 @@ class SimpleCadData(object):
     self.shape_mats = dict()
     self.load_all_mats()
     self.load_torch_tensors()
-    self.outSampleTsfds = torch.Tensor(self.batchSize, self.nSamplePoints).fill_(0).cuda()
+    self.outSampleTsfds = torch.Tensor(self.batchSize, self.nSamplePoints).fill_(0)
 
   def load_all_mats(self):
     for ix in range(len(self.modelNames)):
@@ -64,10 +64,10 @@ class SimpleCadData(object):
       self.all_closetPoints.append(torch.from_numpy(shape['closestPoints']).float())
       self.all_surfaceSamples.append(torch.from_numpy(shape['surfaceSamples']).float())
 
-    self.all_tsdfs = torch.stack(self.all_tsdfs).cuda()
-    self.all_volumes = torch.stack(self.all_volumes).unsqueeze(1).cuda()
-    self.all_closetPoints = torch.stack(self.all_closetPoints).unsqueeze(1).cuda()
-    self.all_surfaceSamples = torch.stack(self.all_surfaceSamples).cuda()
+    self.all_tsdfs = torch.stack(self.all_tsdfs)
+    self.all_volumes = torch.stack(self.all_volumes).unsqueeze(1)
+    self.all_closetPoints = torch.stack(self.all_closetPoints).unsqueeze(1)
+    self.all_surfaceSamples = torch.stack(self.all_surfaceSamples)
 
 
   # def reloadShapes(self):
@@ -96,7 +96,7 @@ class SimpleCadData(object):
       shape_dict = self.shape_mats[self.modelNames[self.startModelIndex]]
       ids.append(self.startModelIndex)
 
-    ids = torch.LongTensor(ids).cuda()
+    ids = torch.LongTensor(ids)
     # pdb.set_trace()
     self.loadedVoxels = self.all_volumes[ids]
     self.loadedTsdfs = self.all_tsdfs[ids]
@@ -128,7 +128,7 @@ class SimpleCadData(object):
     # pdb.set_trace()
     for b in range(self.batchSize):
       nPointsTot = self.loadedSurfaceSamples[b].size(0)
-      sample_ids = torch.LongTensor(np.random.randint(0, nPointsTot, self.nSamplePoints)).cuda()
+      sample_ids = torch.LongTensor(np.random.randint(0, nPointsTot, self.nSamplePoints))
       outSamplePoints.append(self.loadedSurfaceSamples[b][sample_ids])
     outSamplePoints = torch.stack(outSamplePoints)
     output = [self.loadedShapes, self.outSampleTsfds, outSamplePoints, self.loadedCPs]
@@ -148,7 +148,7 @@ class SimpleCadData(object):
     neighbourIds = self.pointClosestCellIndex(queryPoints).data
     # queryDiffs = queryPoints.clone()
     # queryDiffs.data.fill_(0)
-    loadedCPs = Variable(self.loadedCPs.cuda())
+    loadedCPs = Variable(self.loadedCPs)
     queryDiffs = []
     cps = []
     batch_size = queryPoints.size(0)
